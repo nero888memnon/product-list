@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product List</title>
+  <!-- Tailwind CSS CDN for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+  <div class="container mx-auto p-4">
+    <!-- Page Title -->
+    <h1 class="text-2xl font-bold text-center mb-6">Product List</h1>
+
+    <!-- Filters Section -->
+    <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
+      <!-- Category Filter -->
+      <div class="flex items-center">
+        <label for="categoryFilter" class="mr-2 font-medium">Category:</label>
+        <select id="categoryFilter" class="border border-gray-300 rounded px-2 py-1">
+          <option value="all">All Categories</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Books">Books</option>
+          <option value="Clothing">Clothing</option>
+        </select>
+      </div>
+      <!-- Price Filter -->
+      <div class="flex items-center">
+        <label for="priceFilter" class="mr-2 font-medium">Price:</label>
+        <select id="priceFilter" class="border border-gray-300 rounded px-2 py-1">
+          <option value="all">All Prices</option>
+          <option value="under50">Under $50</option>
+          <option value="50to100">$50–$100</option>
+          <option value="over100">Over $100</option>
+        </select>
+      </div>
+      <!-- Sort Filter -->
+      <div class="flex items-center">
+        <label for="sortOrder" class="mr-2 font-medium">Sort by:</label>
+        <select id="sortOrder" class="border border-gray-300 rounded px-2 py-1">
+          <option value="none">None</option>
+          <option value="priceAsc">Price: Low to High</option>
+          <option value="alpha">Name: A-Z</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Product List Grid -->
+    <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <!-- Products will be rendered here by JavaScript -->
+    </div>
+  </div>
+
+  <!-- JavaScript for Filtering and Sorting -->
+  <script>
+    // Product data array (mock products)
+    const products = [
+      {
+        name: "Smartphone XYZ",
+        category: "Electronics",
+        price: 799,
+        description: "Latest model smartphone with advanced features.",
+        image: "https://via.placeholder.com/400x300?text=Smartphone"
+      },
+      {
+        name: "Laptop ABC",
+        category: "Electronics",
+        price: 1299,
+        description: "High-performance laptop suitable for work and gaming.",
+        image: "https://via.placeholder.com/400x300?text=Laptop"
+      },
+      {
+        name: "Wireless Headphones",
+        category: "Electronics",
+        price: 45,
+        description: "Noise-cancelling wireless over-ear headphones.",
+        image: "https://via.placeholder.com/400x300?text=Headphones"
+      },
+      {
+        name: "Tailwind CSS Guide",
+        category: "Books",
+        price: 35,
+        description: "A comprehensive guide to Tailwind CSS with practical examples.",
+        image: "https://via.placeholder.com/400x300?text=Tailwind+Book"
+      },
+      {
+        name: "Fiction Novel",
+        category: "Books",
+        price: 12,
+        description: "An engaging fiction novel with an intriguing plot.",
+        image: "https://via.placeholder.com/400x300?text=Novel"
+      },
+      {
+        name: "Denim Jeans",
+        category: "Clothing",
+        price: 60,
+        description: "Classic denim jeans with a comfortable fit.",
+        image: "https://via.placeholder.com/400x300?text=Jeans"
+      },
+      {
+        name: "Plain T-Shirt",
+        category: "Clothing",
+        price: 25,
+        description: "Soft cotton t-shirt in a solid color.",
+        image: "https://via.placeholder.com/400x300?text=T-Shirt"
+      },
+      {
+        name: "Leather Jacket",
+        category: "Clothing",
+        price: 120,
+        description: "Stylish leather jacket with a modern design.",
+        image: "https://via.placeholder.com/400x300?text=Jacket"
+      }
+    ];
+
+    const productListEl = document.getElementById("product-list");
+
+    // Function to render products array to the grid
+    function renderProducts(list) {
+      if (list.length === 0) {
+        // Show a 'no products' message if list is empty
+        productListEl.innerHTML = '<p class="col-span-full text-center text-gray-600">No products found.</p>';
+        return;
+      }
+      // Build the HTML for each product card
+      productListEl.innerHTML = list.map(product => `
+        <div class="bg-white rounded-lg shadow overflow-hidden flex flex-col">
+          <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover" />
+          <div class="p-4 flex flex-col flex-1">
+            <div class="flex justify-between items-baseline">
+              <h3 class="text-lg font-semibold">${product.name}</h3>
+              <span class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full">${product.category}</span>
+            </div>
+            <p class="text-gray-900 font-semibold mt-2">$${product.price}</p>
+            <p class="text-gray-700 text-sm flex-1 mb-2">${product.description}</p>
+            <button class="bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded hover:bg-blue-600 focus:outline-none">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      `).join('');
+      // Attach a click event to each "Add to Cart" button (for demo purposes)
+      const cartButtons = document.querySelectorAll("#product-list .bg-white button");
+      cartButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const prodName = btn.parentElement.querySelector("h3").innerText;
+          alert(`${prodName} added to cart (placeholder)`);
+        });
+      });
+    }
+
+    // Filtering function to apply selected filters and sorting
+    function filterProducts() {
+      // Start with all products
+      let filtered = products.slice();  // copy array to avoid mutating original
+      const selectedCategory = document.getElementById("categoryFilter").value;
+      const selectedPrice = document.getElementById("priceFilter").value;
+      const selectedSort = document.getElementById("sortOrder").value;
+      // Filter by category
+      if (selectedCategory !== "all") {
+        filtered = filtered.filter(p => p.category === selectedCategory);
+      }
+      // Filter by price range
+      if (selectedPrice !== "all") {
+        if (selectedPrice === "under50") {
+          filtered = filtered.filter(p => p.price < 50);
+        } else if (selectedPrice === "50to100") {
+          filtered = filtered.filter(p => p.price >= 50 && p.price <= 100);
+        } else if (selectedPrice === "over100") {
+          filtered = filtered.filter(p => p.price > 100);
+        }
+      }
+      // Sort the filtered list
+      if (selectedSort !== "none") {
+        if (selectedSort === "priceAsc") {
+          filtered.sort((a, b) => a.price - b.price);
+        } else if (selectedSort === "alpha") {
+          filtered.sort((a, b) => a.name.localeCompare(b.name));
+        }
+      }
+      // Render the resulting list
+      renderProducts(filtered);
+    }
+
+    // Initial render of all products
+    renderProducts(products);
+    // Set up event listeners for filters
+    document.getElementById("categoryFilter").addEventListener("change", filterProducts);
+    document.getElementById("priceFilter").addEventListener("change", filterProducts);
+    document.getElementById("sortOrder").addEventListener("change", filterProducts);
+  </script>
+</body>
+</html>
